@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NLVX Arena </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-red: #FF3B30;
+            --dark-bg: #0A0E27;
+            --card-bg: rgba(15, 18, 40, 0.7);
+            --border-color: rgba(255, 59, 48, 0.2);
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+        }
+
+        .language-dropdown {
+            position: relative;
+            display: inline-block;
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            background: rgba(255, 59, 48, 0.08);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 700;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 130px;
+            justify-content: space-between;
+        }
+
+        .lang-btn:hover {
+            background-color: rgba(255, 59, 48, 0.15);
+            border-color: var(--primary-red);
+            transform: translateY(-2px);
+        }
+
+        .lang-btn svg {
+            width: 1.1rem;
+            height: 1.1rem;
+            stroke: var(--primary-red);
+            transition: transform 0.4s ease;
+        }
+
+        .language-dropdown.active .lang-btn svg {
+            transform: rotate(180deg);
+        }
+
+        .lang-options {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: #0f1228;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            overflow: hidden;
+            display: none;
+            min-width: 150px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            animation: slideInDown 0.3s ease-out;
+        }
+
+        .language-dropdown.active .lang-options {
+            display: block;
+        }
+
+        .lang-option {
+            padding: 0.75rem 1.2rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .lang-option:hover {
+            background: rgba(255, 59, 48, 0.15);
+            color: var(--primary-red);
+        }
+
+        .lang-option.selected {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--primary-red);
+            border-left: 3px solid var(--primary-red);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Arabic', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0A0E27 0%, #1a1f3a 50%, #0A0E27 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            letter-spacing: 0.3px;
+        }
+
+        /* Ultra-Sleek Scrollbar for all elements */
+        *::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: rgba(255, 59, 48, 0.2);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        *::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 59, 48, 0.5);
+        }
+
+        /* Custom Scrollbar for Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 59, 48, 0.2) transparent;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            background: rgba(10, 14, 39, 0.95);
+            padding: 1.5rem 2rem;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.5rem;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            letter-spacing: -1px;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-text {
+            background: linear-gradient(135deg, #FFFFFF, #FF3B30);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-info {
+            flex: 1;
+            margin: 0 2rem;
+            text-align: center;
+        }
+
+        .debate-title {
+            font-size: 1.25rem;
+            font-weight: 900;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.5px;
+        }
+
+        .debate-topic {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .timer {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--primary-red);
+            min-width: 100px;
+            text-align: right;
+            font-family: 'SF Mono', monospace;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 200px);
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 1.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            background: rgba(255, 59, 48, 0.2);
+            border: 2px solid var(--primary-red);
+            flex-shrink: 0;
+        }
+
+        .message-name {
+            font-size: 0.95rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-left: auto;
+            font-family: 'SF Mono', monospace;
+        }
+
+        .message-content {
+            background: rgba(255, 59, 48, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1rem;
+            line-height: 1.7;
+            word-wrap: break-word;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .message-content:hover {
+            background: rgba(255, 59, 48, 0.1);
+            border-color: var(--primary-red);
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-family: inherit;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 59, 48, 0.2);
+            border-color: var(--primary-red);
+            transform: translateY(-2px);
+        }
+
+        .input-area {
+            display: flex;
+            gap: 1rem;
+            margin-top: auto;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 1rem 1.25rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: var(--primary-red);
+            background: rgba(255, 59, 48, 0.1);
+            box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.1);
+        }
+
+        .message-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .send-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #FF3B30, #FF6B5B);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3);
+            font-weight: 700;
+            font-family: inherit;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 59, 48, 0.6);
+        }
+
+        .send-btn:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        .pause-btn {
+            padding: 1rem 1.5rem;
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 12px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .pause-btn:hover {
+            background: rgba(255, 107, 107, 0.2);
+            border-color: #ff6b6b;
+            transform: translateY(-2px);
+        }
+
+        .pause-btn.paused {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: -0.3px;
+        }
+
+        .debater-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .debater-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .debater-item:hover {
+            background: rgba(255, 59, 48, 0.1);
+            border-left: 3px solid var(--primary-red);
+            padding-left: 0.5rem;
+        }
+
+        .debater-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            background: rgba(255, 59, 48, 0.2);
+            flex-shrink: 0;
+            border: 1px solid var(--primary-red);
+        }
+
+        .debater-name {
+            font-size: 0.9rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .debater-status {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-left: auto;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .back-btn {
+            padding: 1rem;
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: center;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 59, 48, 0.2);
+            border-color: var(--primary-red);
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--primary-red);
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .loading:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+            30% { opacity: 1; transform: translateY(-10px); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .header-info {
+                margin: 0;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .chat-area {
+                height: calc(100vh - 300px);
+            }
+
+            .sidebar {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            .input-wrapper {
+                flex-direction: column;
+            }
+
+            .message-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo" onclick="window.location.href='index.html'">
+                <span class="logo-text">NLVX ARENA</span>
+            </div>
+            <div class="header-info">
+                <div class="debate-title" id="debateTitle">Debate Arena</div>
+                <div class="debate-topic" id="debateTopic">Loading topic...</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                <div class="language-dropdown" id="languageDropdown">
+                    <button class="lang-btn" onclick="toggleLangDropdown()">
+                        <span id="currentLangText">English</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="lang-options">
+                        <div class="lang-option" onclick="changeLanguage('en')">English</div>
+                        <div class="lang-option" onclick="changeLanguage('ar')">العربية</div>
+                        <div class="lang-option" onclick="changeLanguage('fr')">Français</div>
+                        <div class="lang-option" onclick="changeLanguage('es')">Español</div>
+                        <div class="lang-option" onclick="changeLanguage('de')">Deutsch</div>
+                        <div class="lang-option" onclick="changeLanguage('nl')">Nederlands</div>
+                    </div>
+                </div>
+                <div class="timer" id="timer">00:00</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="chat-area">
+            <div class="messages-container" id="messagesContainer"></div>
+
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        class="message-input" 
+                        id="messageInput" 
+                        placeholder="Share your thoughts..."
+                        onkeypress="handleKeyPress(event)"
+                    >
+                    <button class="send-btn" onclick="sendMessage()" title="Send message">→</button>
+                </div>
+                <button class="pause-btn" id="pauseBtn" onclick="togglePause()">Pause</button>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="sidebar-card">
+                <div class="sidebar-title" id="participantsTitle">Debaters</div>
+                <div class="debater-list" id="debaterList"></div>
+            </div>
+
+            <div class="sidebar-card">
+                <div class="sidebar-title" id="settingsTitle">Settings</div>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.9rem; color: var(--text-secondary); font-weight: 500;">
+                    <div>
+                        <strong id="durationLabel">Duration:</strong> <span id="settingsDuration">15</span> <span class="min-label">min</span>
+                    </div>
+                    <div>
+                        <strong id="languageLabel">Language:</strong> <span id="settingsLanguage">English</span>
+                    </div>
+                    <button class="back-btn" id="backBtn" onclick="window.location.href='index.html'" style="margin-top: 1rem;">Back to Arena</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DEBATER_TYPES = [
+            { name: 'Optimist' },
+            { name: 'Critic' },
+            { name: 'Analyst' },
+            { name: 'Visionary' },
+            { name: 'Investor' },
+            { name: 'Scientist' },
+            { name: 'Philosopher' },
+            { name: 'Strategist' },
+        ];
+        let conversationHistory = [];
+        let isPaused = false;
+        let timeRemaining = 0;
+        let timerInterval;
+        let debateConfig;
+        let isLocalEnvironment = false;
+        let currentLanguage = 'en';
+
+        const TRANSLATIONS = {
+            en: {
+                debateTitle: 'Debate in Progress',
+                participants: 'Participants',
+                settings: 'Settings',
+                duration: 'Duration',
+                language: 'Language',
+                pause: 'Pause',
+                resume: 'Resume',
+                inputPlaceholder: 'Type a message...',
+                reply: 'Reply',
+                debateEnded: 'Debate Ended',
+                thankYou: 'Thank you for participating!',
+                backToArena: 'Back to Arena',
+                thinking: 'Thinking...',
+                min: 'min'
+            },
+            ar: {
+                debateTitle: 'النقاش جارٍ',
+                participants: 'المشاركون',
+                settings: 'الإعدادات',
+                duration: 'المدة',
+                language: 'اللغة',
+                pause: 'إيقاف مؤقت',
+                resume: 'استئناف',
+                inputPlaceholder: 'اكتب رسالة...',
+                reply: 'رد',
+                debateEnded: 'انتهى النقاش',
+                thankYou: 'شكراً لمشاركتك!',
+                backToArena: 'العودة إلى الساحة',
+                thinking: 'يفكر...',
+                min: 'دقيقة'
+            },
+            fr: {
+                debateTitle: 'Débat en cours',
+                participants: 'Participants',
+                settings: 'Paramètres',
+                duration: 'Durée',
+                language: 'Langue',
+                pause: 'Pause',
+                resume: 'Reprendre',
+                inputPlaceholder: 'Tapez un message...',
+                reply: 'Répondre',
+                debateEnded: 'Débat terminé',
+                thankYou: 'Merci de votre participation !',
+                backToArena: 'Retour à l\'arène',
+                thinking: 'Réflexion...',
+                min: 'min'
+            },
+            es: {
+                debateTitle: 'Debate en curso',
+                participants: 'Participantes',
+                settings: 'Ajustes',
+                duration: 'Duración',
+                language: 'Idioma',
+                pause: 'Pausa',
+                resume: 'Reanudar',
+                inputPlaceholder: 'Escribe un mensaje...',
+                reply: 'Responder',
+                debateEnded: 'Debate finalizado',
+                thankYou: '¡Gracias por participar!',
+                backToArena: 'Volver a la arena',
+                thinking: 'Pensando...',
+                min: 'min'
+            },
+            de: {
+                debateTitle: 'Debatte läuft',
+                participants: 'Teilnehmer',
+                settings: 'Einstellungen',
+                duration: 'Dauer',
+                language: 'Sprache',
+                pause: 'Pause',
+                resume: 'Fortsetzen',
+                inputPlaceholder: 'Nachricht schreiben...',
+                reply: 'Antworten',
+                debateEnded: 'Debatte beendet',
+                thankYou: 'Vielen Dank für die Teilnahme!',
+                backToArena: 'Zurück zur Arena',
+                thinking: 'Denkt nach...',
+                min: 'Min'
+            },
+            nl: {
+                debateTitle: 'Debat in uitvoering',
+                participants: 'Deelnemers',
+                settings: 'Instellingen',
+                duration: 'Duur',
+                language: 'Taal',
+                pause: 'Pauze',
+                resume: 'Hervatten',
+                inputPlaceholder: 'Typ een bericht...',
+                reply: 'Beantwoorden',
+                debateEnded: 'Debat beëindigd',
+                thankYou: 'Bedankt voor uw deelname!',
+                backToArena: 'Terug naar Arena',
+                thinking: 'Aan het denken...',
+                min: 'min'
+            }
+        };
+
+        function toggleLangDropdown() {
+            document.getElementById('languageDropdown').classList.toggle('active');
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.language-dropdown')) {
+                const dropdown = document.getElementById('languageDropdown');
+                if (dropdown && dropdown.classList.contains('active')) {
+                    dropdown.classList.remove('active');
+                }
+            }
+        }
+
+        function changeLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('nlvx_ui_lang', lang);
+            updateUI();
+            
+            const langNames = {
+                en: 'English', ar: 'العربية', fr: 'Français', es: 'Español', de: 'Deutsch', nl: 'Nederlands'
+            };
+            document.getElementById('currentLangText').textContent = langNames[lang];
+            
+            const options = document.querySelectorAll('.lang-option');
+            options.forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.textContent === langNames[lang]) opt.classList.add('selected');
+            });
+
+            document.getElementById('languageDropdown').classList.remove('active');
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+        }
+
+        function updateUI() {
+            const trans = TRANSLATIONS[currentLanguage];
+            document.getElementById('debateTitle').textContent = trans.debateTitle;
+            document.getElementById('participantsTitle').textContent = trans.participants;
+            document.getElementById('settingsTitle').textContent = trans.settings;
+            document.getElementById('durationLabel').textContent = trans.duration + ':';
+            document.getElementById('languageLabel').textContent = trans.language + ':';
+            document.getElementById('pauseBtn').textContent = isPaused ? trans.resume : trans.pause;
+            document.getElementById('messageInput').placeholder = trans.inputPlaceholder;
+            document.getElementById('backBtn').textContent = trans.backToArena;
+            
+            // Update min label if it exists
+            const minLabel = document.querySelector('.min-label');
+            if (minLabel) minLabel.textContent = trans.min;
+        }
+
+        function initLanguage() {
+            const savedLang = localStorage.getItem('nlvx_ui_lang') || 'en';
+            changeLanguage(savedLang);
+        }nversationHistory = [];
+
+        // Detect environment
+        function detectEnvironment() {
+            const hostname = window.location.hostname;
+            isLocalEnvironment = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.includes('192.168');
+            console.log('Environment:', isLocalEnvironment ? 'Local' : 'Vercel');
+        }
+
+        async function callAI(topic, debaterType, debateLanguage, context) {
+            try {
+                let response;
+                if (isLocalEnvironment) {
+                    // Local: Call Groq API directly
+                    response = await callGroqAPIDirectly(topic, debaterType, debateLanguage, context);
+                } else {
+                    // Vercel: Call serverless function
+                    response = await callServerlessFunction(topic, debaterType, debateLanguage, context);
+                }
+                
+                if (!response || response.includes('is thinking...')) {
+                    throw new Error('Invalid response from API');
+                }
+                return response;
+            } catch (error) {
+                console.error('AI call failed:', error);
+                // Fallback messages to keep the debate moving if API fails
+                const fallbacks = {
+                    en: "I'm considering the points raised, but I need a moment to formulate my full perspective on this complex topic.",
+                    ar: "أنا أفكر في النقاط المطروحة، لكنني أحتاج إلى لحظة لصياغة وجهة نظري الكاملة حول هذا الموضوع المعقد.",
+                    fr: "Je réfléchis aux points soulevés, mais j'ai besoin d'un moment pour formuler ma perspective complète sur ce sujet complexe.",
+                    es: "Estoy considerando los puntos planteados, pero necesito un momento para formular mi perspectiva completa sobre este tema complejo.",
+                    de: "Ich denke über die vorgebrachten Punkte nach, brauche aber einen Moment, um meine vollständige Perspektive zu diesem komplexen Thema zu formulieren.",
+                    nl: "Ik overweeg de naar voren gebrachte punten, maar ik heb even tijd nodig om mijn volledige perspectief op dit complexe onderwerp te formuleren."
+                };
+                return fallbacks[debateLanguage] || fallbacks['en'];
+            }
+        }
+
+        async function callGroqAPIDirectly(topic, debaterType, debateLanguage, context) {
+            const GROQ_API_KEY = localStorage.getItem('GROQ_API_KEY') || prompt('Enter your Groq API Key:');
+            if (!GROQ_API_KEY) throw new Error('No API key provided');
+            
+            localStorage.setItem('GROQ_API_KEY', GROQ_API_KEY);
+
+            const systemPrompts = {
+                Optimist: 'You are an optimistic debater who sees positive potential and opportunities. Be encouraging and constructive.',
+                Critic: 'You are a critical debater who questions assumptions and identifies problems. Be thoughtful but constructive.',
+                Analyst: 'You are an analytical debater who relies on data, logic, and evidence-based arguments.',
+                Visionary: 'You are a visionary debater who thinks about future implications and possibilities.',
+                Investor: 'You are an investor debater focused on ROI, market potential, and financial viability.',
+                Scientist: 'You are a scientist debater who emphasizes research, methodology, and empirical evidence.',
+                Philosopher: 'You are a philosophical debater who explores deeper meanings and ethical implications.',
+                Strategist: 'You are a strategic debater who thinks about long-term planning and competitive advantages.',
+            };
+
+            const userMessage = context 
+                ? `Topic: "${topic}"\n\nPrevious discussion history:\n${context}\n\nINSTRUCTIONS for ${debaterType}:\n1. READ the last message carefully.\n2. DIRECTLY REPLY or REBUT the last speaker's points.\n3. Maintain your persona as a ${debaterType}.\n4. Keep it conversational and natural. (2-3 sentences max)`
+                : `Topic: "${topic}"\n\nPlease provide your initial perspective as a ${debaterType}. Keep it concise (2-3 sentences).`;
+
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${GROQ_API_KEY}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    model: 'llama-3.3-70b-versatile',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: `${systemPrompts[debaterType]} Respond in ${getLanguageName(debateLanguage)}.`,
+                        },
+                        {
+                            role: 'user',
+                            content: userMessage,
+                        },
+                    ],
+                    temperature: 0.7,
+                    max_tokens: 300,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Groq API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+
+        async function callServerlessFunction(topic, debaterType, debateLanguage, context) {
+            const response = await fetch('/api/debate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    topic,
+                    debaterType,
+                    debateLanguage,
+                    context,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.message;
+        }
+
+        function getLanguageName(code) {
+            const languages = {
+                en: 'English',
+                ar: 'Arabic',
+                fr: 'French',
+                es: 'Spanish',
+                de: 'German',
+                nl: 'Dutch',
+            };
+            return languages[code] || 'English';
+        }
+
+        function initDebate() {
+            detectEnvironment();
+            const config = sessionStorage.getItem('debateConfig');
+            if (!config) {
+                window.location.href = './index.html';
+                return;
+            }
+
+            debateConfig = JSON.parse(config);
+            timeRemaining = debateConfig.duration * 60;
+
+            document.getElementById('debateTitle').textContent = 'Debate in Progress';
+            document.getElementById('debateTopic').textContent = debateConfig.topic;
+            document.getElementById('settingsDuration').textContent = debateConfig.duration;
+            document.getElementById('settingsLanguage').textContent = debateConfig.debateLanguage.toUpperCase();
+
+            initDebaterList();
+            startTimer();
+            generateInitialMessages();
+
+            // Close on ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (confirm('Close the debate?')) {
+                        window.location.href = './index.html';
+                    }
+                }
+            });
+        }
+
+        function initDebaterList() {
+            const list = document.getElementById('debaterList');
+            list.innerHTML = '';
+
+            debateConfig.selectedBots.forEach((botName, index) => {
+                const bot = DEBATER_TYPES.find(b => b.name === botName);
+                if (bot) {
+                    const item = document.createElement('div');
+                    item.className = 'debater-item';
+                    item.style.animation = `fadeInUp 0.6s ease-out ${0.1 + index * 0.05}s both`;
+                    item.innerHTML = `
+                        <div class="debater-avatar">${botName.charAt(0)}</div>
+                        <div class="debater-name">${bot.name}</div>
+                        <div class="debater-status">
+                            <div class="status-dot"></div>
+                        </div>
+                    `;
+                    list.appendChild(item);
+                }
+            });
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (!isPaused && timeRemaining > 0) {
+                    timeRemaining--;
+                    updateTimerDisplay();
+
+                    if (timeRemaining === 0) {
+                        clearInterval(timerInterval);
+                        endDebate();
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('timer').textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            const btn = document.getElementById('pauseBtn');
+            btn.classList.toggle('paused');
+            btn.textContent = isPaused ? 'Resume' : 'Pause';
+        }
+
+        async function generateInitialMessages() {
+            const bots = debateConfig.selectedBots.slice(0, Math.min(3, debateConfig.selectedBots.length));
+            for (let i = 0; i < bots.length; i++) {
+                if (timeRemaining <= 0) break;
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                const botName = bots[i];
+                const response = await callAI(debateConfig.topic, botName, debateConfig.debateLanguage, '');
+                addMessage(botName, response);
+                conversationHistory.push(`${botName}: ${response}`);
+            }
+            
+            // Start the continuous debate loop
+            startContinuousDebate();
+        }
+
+        async function startContinuousDebate() {
+            while (timeRemaining > 0) {
+                // Wait for a few seconds between messages
+                await new Promise(resolve => setTimeout(resolve, 10000));
+
+                if (isPaused || timeRemaining <= 0) continue;
+
+                // Pick a random bot that wasn't the last one to speak
+                const lastMessage = conversationHistory.length > 0 ? conversationHistory[conversationHistory.length - 1] : '';
+                const lastSpeaker = lastMessage.split(':')[0].trim();
+                
+                // Don't let bots interrupt if the last message was from 'You' recently
+                if (lastSpeaker === 'You') {
+                    await new Promise(resolve => setTimeout(resolve, 5000));
+                }
+
+                const availableBots = debateConfig.selectedBots.filter(b => b !== lastSpeaker);
+                const randomBot = availableBots[Math.floor(Math.random() * availableBots.length)];
+                
+                // Show loading/thinking state
+                const trans = TRANSLATIONS[currentLanguage];
+                const container = document.getElementById('messagesContainer');
+                const loadingEl = document.createElement('div');
+                loadingEl.className = 'message';
+                loadingEl.id = 'loading-indicator';
+                loadingEl.innerHTML = `
+                    <div class="message-header">
+                        <div class="message-avatar">${randomBot.charAt(0)}</div>
+                        <div class="message-name">${randomBot} (${trans.thinking})</div>
+                    </div>
+                    <div class="message-content">
+                        <span class="loading"></span>
+                        <span class="loading"></span>
+                        <span class="loading"></span>
+                    </div>
+                `;
+                container.appendChild(loadingEl);
+                container.scrollTop = container.scrollHeight;
+
+                try {
+                    // Get AI response with context - specifically including the last message for direct reply
+                    const contextStr = conversationHistory.slice(-5).join('\n');
+                    const response = await callAI(debateConfig.topic, randomBot, debateConfig.debateLanguage, contextStr);
+                    
+                    loadingEl.remove();
+                    
+                    if (!isPaused && timeRemaining > 0) {
+                        addMessage(randomBot, response);
+                        conversationHistory.push(`${randomBot}: ${response}`);
+                    }
+                } catch (error) {
+                    console.error('Debate loop error:', error);
+                    if (loadingEl) loadingEl.remove();
+                }
+            }
+        }
+
+        function addMessage(name, content, isUser = false) {
+            const container = document.getElementById('messagesContainer');
+            const bot = DEBATER_TYPES.find(b => b.name === name);
+            const initial = bot ? bot.name.charAt(0) : 'U';
+
+            const messageEl = document.createElement('div');
+            messageEl.className = 'message';
+            messageEl.innerHTML = `
+                <div class="message-header">
+                    <div class="message-avatar">${initial}</div>
+                    <div class="message-name">${name}</div>
+                    <div class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                </div>
+                <div class="message-content">${content}</div>
+                ${!isUser ? `
+                    <div class="message-actions">
+                        <button class="action-btn" onclick="replyToMessage('${name}')">Reply</button>
+                        <button class="action-btn" onclick="pauseForResponse()">Pause</button>
+                    </div>
+                ` : ''}
+            `;
+
+            container.appendChild(messageEl);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const content = input.value.trim();
+
+            if (!content) return;
+
+            addMessage('You', content, true);
+            input.value = '';
+            conversationHistory.push(`You: ${content}`);
+
+            // Get random bot to respond
+            const randomBot = debateConfig.selectedBots[Math.floor(Math.random() * debateConfig.selectedBots.length)];
+            
+            // Show loading
+            const container = document.getElementById('messagesContainer');
+            const loadingEl = document.createElement('div');
+            loadingEl.className = 'message';
+            loadingEl.innerHTML = `
+                <div class="message-header">
+                    <div class="message-avatar">${randomBot.charAt(0)}</div>
+                    <div class="message-name">${randomBot}</div>
+                </div>
+                <div class="message-content">
+                    <span class="loading"></span>
+                    <span class="loading"></span>
+                    <span class="loading"></span>
+                </div>
+            `;
+            container.appendChild(loadingEl);
+            container.scrollTop = container.scrollHeight;
+
+            // Get AI response
+            const contextStr = conversationHistory.slice(-5).join('\n');
+            const response = await callAI(debateConfig.topic, randomBot, debateConfig.debateLanguage, contextStr);
+            
+            loadingEl.remove();
+            addMessage(randomBot, response);
+            conversationHistory.push(`${randomBot}: ${response}`);
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function replyToMessage(botName) {
+            const input = document.getElementById('messageInput');
+            input.focus();
+            input.placeholder = `Reply to ${botName}...`;
+        }
+
+        function pauseForResponse() {
+            if (!isPaused) {
+                togglePause();
+            }
+        }
+
+        function endDebate() {
+            const trans = TRANSLATIONS[currentLanguage];
+            const container = document.getElementById('messagesContainer');
+            const endMessage = document.createElement('div');
+            endMessage.className = 'message';
+            endMessage.style.textAlign = 'center';
+            endMessage.style.animation = 'fadeInUp 0.6s ease-out';
+            endMessage.innerHTML = `
+                <div style="padding: 2rem; background: rgba(255, 59, 48, 0.1); border-radius: 14px; border: 1px solid rgba(255, 59, 48, 0.3);">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">${trans.debateEnded}</div>
+                    <div style="color: var(--text-secondary); margin-bottom: 1.5rem;">${trans.thankYou}</div>
+                    <button class="back-btn" onclick="window.location.href='index.html'" style="max-width: 300px; margin: 0 auto;">${trans.backToArena}</button>
+                </div>
+            `;
+            container.appendChild(endMessage);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        window.addEventListener('load', () => {
+            initDebate();
+            initLanguage();
+        });
+    </script>
+</body>
+</html>
